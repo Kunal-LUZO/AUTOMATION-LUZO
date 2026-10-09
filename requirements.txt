@@ -1,0 +1,10 @@
+
+selenium
+pytest
+pytest-html
+
+#Registration Page =  pytest -v -s testCases/test_Registration_001.py
+
+#Login Page = pytest -v -s testCases/test_Login_002.py
+
+#Booking Flow = pytest -v -s testCases/test_Booking_Flow_003.py
