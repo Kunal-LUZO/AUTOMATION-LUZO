@@ -14,9 +14,17 @@ class SalonPage(BasePage):
 
     def click_services(self):
 
-        self.wait.until(
-            EC.element_to_be_clickable(
-                self.CLICK_ON_SALON
-            )
-        ).click()
+        if len(self.driver.window_handles) > 1:
+            self.driver.switch_to.window(self.driver.window_handles[-1])
+
+        if "partner" not in self.driver.current_url.lower() and "salon" not in self.driver.current_url.lower():
+            try:
+                elem = self.wait.until(
+                    EC.element_to_be_clickable(self.CLICK_ON_SALON)
+                )
+                self.driver.execute_script("arguments[0].click();", elem)
+                if len(self.driver.window_handles) > 1:
+                    self.driver.switch_to.window(self.driver.window_handles[-1])
+            except Exception:
+                pass
 

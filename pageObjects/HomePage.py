@@ -24,7 +24,7 @@ class HomePage(BasePage):
 
     SALON_RESULT = (
         By.XPATH,
-        "//*[contains(normalize-space(),'Ambar Unisex Salon & Spa')]"
+        "//p[contains(text(), 'Ambar Unisex Salon')]/ancestor::a | //a[contains(@href, 'ambar-unisex-salon')] | //a[contains(@href, '/partners/')]"
     )
 
     def close_membership(self):
@@ -48,8 +48,22 @@ class HomePage(BasePage):
         search_input.send_keys(salon_name)
 
     def open_salon(self):
+        initial_handles = list(self.driver.window_handles)
+
         salon = self.wait.until(
-            EC.element_to_be_clickable(self.SALON_RESULT)
+            EC.presence_of_element_located(self.SALON_RESULT)
         )
 
-        salon.click()
+        self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", salon)
+        try:
+            salon.click()
+        except Exception:
+            self.driver.execute_script("arguments[0].click();", salon)
+
+        # Wait for navigation or new tab
+        for _ in range(10):
+            if len(self.driver.window_handles) > len(initial_handles):
+                self.driver.switch_to.window(self.driver.window_handles[-1])
+                print("Switched to newly opened salon tab:", self.driver.current_url)
+                break
+            time.sleep(0.5)

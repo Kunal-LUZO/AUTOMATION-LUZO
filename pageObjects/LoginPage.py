@@ -1,3 +1,4 @@
+import time
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -42,23 +43,25 @@ class LoginPage:
     )
 
     # =================================================
-    # LOCATION POPUP
-    # =================================================
+    Location_buttons = (
+        By.XPATH,
+        "//div[@role='dialog']//button[contains(normalize-space(),'Deny') or contains(normalize-space(),'Allow')]"
+    )
 
     def handle_location_popup(self):
 
         try:
 
-            deny = WebDriverWait(
+            loc_button = WebDriverWait(
                 self.driver,
-                5
+                4
             ).until(
                 EC.element_to_be_clickable(
-                    self.Allow_location
+                    self.Location_buttons
                 )
             )
 
-            deny.click()
+            self.driver.execute_script("arguments[0].click();", loc_button)
 
             print("Location popup handled successfully.")
 
@@ -189,8 +192,19 @@ class LoginPage:
         first_otp_field.click()
         first_otp_field.clear()
         first_otp_field.send_keys(str(otp))
-
         print("OTP entered successfully:", otp)
 
-
-        print("Continue button clicked.")
+        time_btn = None
+        for _ in range(5):
+            for btn in self.driver.find_elements(By.XPATH, "//button[normalize-space()='Continue' or contains(normalize-space(),'Verify') or @type='submit']"):
+                if btn.is_displayed():
+                    try:
+                        self.driver.execute_script("arguments[0].click();", btn)
+                        print("Continue button clicked.")
+                        time_btn = True
+                        break
+                    except Exception:
+                        pass
+            if time_btn:
+                break
+            time.sleep(1)

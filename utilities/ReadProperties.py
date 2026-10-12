@@ -1,10 +1,14 @@
+import os
 import configparser
 
 
 class ReadConfig:
 
     config = configparser.ConfigParser()
-    config.read("./Configurations/config.ini")
+    _config_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "Configurations", "config.ini")
+    )
+    config.read(_config_path)
 
     @staticmethod
     def get_base_url():
